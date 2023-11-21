@@ -1,4 +1,4 @@
-from PyPDF2 import PdfFileWriter, PdfFileReader
+from PyPDF2 import PdfWriter, PdfReader
 import tkinter as tk
 from tkinter import filedialog
 import os
@@ -57,25 +57,25 @@ def main():
 
     for i, paths in enumerate(zip(path_fronts, path_backs, path_output)):
         fronts, backs, output_file = paths
-        pdf_even = PdfFileReader(open(fronts, 'rb'))
-        pdf_odd = PdfFileReader(open(backs, 'rb'))
+        pdf_even = PdfReader(open(fronts, 'rb'))
+        pdf_odd = PdfReader(open(backs, 'rb'))
         print("Start creating pdf: {}".format(output_file))
 
         # assert pdf_even.getNumPages() == pdf_odd.getNumPages()
 
-        if not pdf_even.getNumPages() == pdf_odd.getNumPages():
-            even = PdfFileWriter()
+        if not len(pdf_even.pages) == len(pdf_odd.pages):
+            even = PdfWriter()
             even.cloneDocumentFromReader(pdf_even)
-            odd = PdfFileWriter()
+            odd = PdfWriter()
             odd.cloneDocumentFromReader(pdf_odd)
             add_blank_pages_unless_even(even, odd)
 
-        output = PdfFileWriter()
-        for i in range(pdf_even.getNumPages()):
-            page = pdf_even.getPage(i)
-            output.addPage(page)
-            page = pdf_odd.getPage(pdf_odd.getNumPages() - 1 - i)
-            output.addPage(page)
+        output = PdfWriter()
+        for i in range(len(pdf_even.pages)):
+            page = pdf_even.pages[i]
+            output.add_page(page)
+            page = pdf_odd.pages[len(pdf_odd.pages) - 1 - i]
+            output.add_page(page)
 
         with open(output_file, 'wb') as f:
             output.write(f)
